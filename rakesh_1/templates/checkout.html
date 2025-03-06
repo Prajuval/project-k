@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Checkout</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Order Details</h3>
+                    </div>
+                    <div class="p-6">
+                        <form method="POST" class="space-y-6 needs-validation" novalidate>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="pickup_date" class="block text-sm font-medium text-gray-700">Pickup Date *</label>
+                                    <input type="date" 
+                                           id="pickup_date" 
+                                           name="pickup_date" 
+                                           min="{{ now.strftime('%Y-%m-%d') }}" 
+                                           required
+                                           class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm 
+                                                  focus:ring-indigo-500 focus:border-indigo-500">
+                                    <p class="mt-1 text-sm text-red-600 hidden">Please select a pickup date.</p>
+                                </div>
+                                <div>
+                                    <label for="pickup_time" class="block text-sm font-medium text-gray-700">Pickup Time *</label>
+                                    <input type="time" 
+                                           id="pickup_time" 
+                                           name="pickup_time" 
+                                           required
+                                           class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm 
+                                                  focus:ring-indigo-500 focus:border-indigo-500">
+                                    <p class="mt-1 text-sm text-red-600 hidden">Please select a pickup time.</p>
+                                </div>
+                            </div>
+
+                            <button type="submit" 
+                                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
+                                           shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 
+                                           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                                           transition-colors duration-200">
+                                <i class="fas fa-shopping-cart mr-2"></i> Place Order
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden sticky top-4">
+                    <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Order Summary</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        {% for item in cart_items %}
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-medium text-gray-900">{{ item.food_item.name }}</h4>
+                                <p class="text-sm text-gray-500">Quantity: {{ item.quantity }}</p>
+                            </div>
+                            <span class="font-medium text-gray-900">${{ "%.2f"|format(item.subtotal) }}</span>
+                        </div>
+                        {% if not loop.last %}<div class="border-t border-gray-200"></div>{% endif %}
+                        {% endfor %}
+
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-semibold text-gray-900">Total</span>
+                                <span class="text-lg font-semibold text-gray-900">${{ "%.2f"|format(total) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+
+// Set minimum time based on selected date
+document.getElementById('pickup_date').addEventListener('change', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const selectedDate = this.value;
+    const timeInput = document.getElementById('pickup_time');
+    
+    if (selectedDate === today) {
+        const now = new Date();
+        const currentHour = now.getHours().toString().padStart(2, '0');
+        const currentMinute = now.getMinutes().toString().padStart(2, '0');
+        timeInput.min = `${currentHour}:${currentMinute}`;
+    } else {
+        timeInput.min = '';
+    }
+});
+</script>
+{% endblock %}

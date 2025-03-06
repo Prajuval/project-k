@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Canteen Menu - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold text-center text-gray-900 mb-8">Our Fresh Menu</h1>
+
+        <!-- Category Tabs -->
+        <div class="flex justify-center mb-8 space-x-4 overflow-x-auto py-2">
+            {% set categories = ['Breakfast', 'Lunch', 'Snacks', 'Beverages'] %}
+            {% for category in categories %}
+                <button onclick="switchCategory('{{ category|lower }}')"
+                        class="category-tab px-6 py-3 text-sm font-semibold rounded-full 
+                               {% if loop.first %}active bg-gradient-to-r from-indigo-600 to-purple-600 text-white
+                               {% else %}bg-white text-gray-700 hover:bg-gray-100{% endif %}
+                               transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105
+                               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas 
+                        {% if category == 'Breakfast' %}fa-coffee
+                        {% elif category == 'Lunch' %}fa-utensils
+                        {% elif category == 'Snacks' %}fa-cookie-bite
+                        {% else %}fa-glass-cheers{% endif %} mr-2"></i>
+                    {{ category }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <!-- Menu Items Grid -->
+        <div class="tab-content" id="menuTabContent">
+            {% for category in categories %}
+                <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                     id="{{ category|lower }}" 
+                     role="tabpanel">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {% set food_items = {
+                            'Breakfast': [
+                                {'name': 'Classic Pancakes', 'price': 120, 'description': 'Fluffy pancakes served with maple syrup and butter', 'image_url': 'https://source.unsplash.com/800x600/?pancakes'},
+                                {'name': 'Vegetable Sandwich', 'price': 80, 'description': 'Fresh vegetables with cheese in toasted bread', 'image_url': 'https://source.unsplash.com/800x600/?sandwich'},
+                                {'name': 'Masala Dosa', 'price': 90, 'description': 'Crispy dosa with spicy potato filling and chutneys', 'image_url': 'https://source.unsplash.com/800x600/?dosa'}
+                            ],
+                            'Lunch': [
+                                {'name': 'Veg Thali', 'price': 150, 'description': 'Complete meal with roti, rice, dal, and 2 vegetables', 'image_url': 'https://source.unsplash.com/800x600/?indianfood'},
+                                {'name': 'Chicken Biryani', 'price': 180, 'description': 'Fragrant rice cooked with tender chicken and spices', 'image_url': 'https://source.unsplash.com/800x600/?biryani'},
+                                {'name': 'Pasta Alfredo', 'price': 160, 'description': 'Creamy pasta with garlic and parmesan cheese', 'image_url': 'https://source.unsplash.com/800x600/?pasta'}
+                            ],
+                            'Snacks': [
+                                {'name': 'Samosa', 'price': 30, 'description': 'Crispy pastry filled with spiced potatoes', 'image_url': 'https://source.unsplash.com/800x600/?samosa'},
+                                {'name': 'French Fries', 'price': 80, 'description': 'Crispy golden fries with special seasoning', 'image_url': 'https://source.unsplash.com/800x600/?frenchfries'},
+                                {'name': 'Spring Rolls', 'price': 100, 'description': 'Vegetable filled rolls with sweet chili sauce', 'image_url': 'https://source.unsplash.com/800x600/?springrolls'}
+                            ],
+                            'Beverages': [
+                                {'name': 'Masala Chai', 'price': 20, 'description': 'Indian spiced tea with milk', 'image_url': 'https://source.unsplash.com/800x600/?tea'},
+                                {'name': 'Cold Coffee', 'price': 60, 'description': 'Blended coffee with ice cream', 'image_url': 'https://source.unsplash.com/800x600/?coldcoffee'},
+                                {'name': 'Fresh Lime Soda', 'price': 40, 'description': 'Refreshing lime soda with mint leaves', 'image_url': 'https://source.unsplash.com/800x600/?limesoda'}
+                            ]
+                        } %}
+                        
+                        {% for food in food_items[category] %}
+                            <div class="food-card transform transition-all duration-500 opacity-0 translate-y-4">
+                                <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                                    <div class="relative group">
+                                        <img src="{{ food.image_url }}" 
+                                             class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-110" 
+                                             alt="{{ food.name }}">
+                                        <div class="absolute top-0 right-0 p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-bl-lg">
+                                            <span class="font-bold">₹{{ "%.2f"|format(food.price) }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="p-6">
+                                        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ food.name }}</h3>
+                                        <p class="text-gray-600 mb-4">{{ food.description }}</p>
+                                        
+                                        {% if current_user.is_authenticated and current_user.role != 'admin' %}
+                                            <form action="{{ url_for('add_to_cart', food_id=loop.index) }}" method="post">
+                                                <div class="flex space-x-2">
+                                                    <div class="flex-1 flex items-center bg-gray-100 rounded-lg px-3 hover:bg-gray-200 transition-colors duration-200">
+                                                        <span class="text-gray-600 mr-2">Qty</span>
+                                                        <input type="number" 
+                                                               class="w-full bg-transparent border-none focus:ring-0" 
+                                                               name="quantity" 
+                                                               value="1" 
+                                                               min="1" 
+                                                               max="10">
+                                                    </div>
+                                                    <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg 
+                                                                 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 
+                                                                 transform hover:scale-105 flex items-center space-x-2">
+                                                        <i class="fas fa-cart-plus"></i>
+                                                        <span>Add</span>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        {% else %}
+                                            <a href="{{ url_for('login') }}" 
+                                               class="block w-full text-center py-2 bg-gray-100 text-indigo-600 
+                                                      rounded-lg hover:bg-gray-200 transition-all duration-300
+                                                      transform hover:scale-105">
+                                                <i class="fas fa-sign-in-alt mr-2"></i>Login to Order
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Floating Cart Button -->
+<a href="{{ url_for('cart') }}" 
+   class="fixed bottom-8 right-8 bg-indigo-600 text-white rounded-full p-4 shadow-lg hover:bg-indigo-700 transition-colors duration-300">
+    <i class="fas fa-shopping-cart text-2xl"></i>
+</a>
+
+<script>
+function switchCategory(categoryName) {
+    // Update active tab styling
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        if (tab.innerText.toLowerCase().includes(categoryName)) {
+            tab.classList.add('active', 'bg-gradient-to-r', 'from-indigo-600', 'to-purple-600', 'text-white');
+            tab.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-100');
+        } else {
+            tab.classList.remove('active', 'bg-gradient-to-r', 'from-indigo-600', 'to-purple-600', 'text-white');
+            tab.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-100');
+        }
+    });
+
+    // Update content visibility
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        if (pane.id === categoryName) {
+            pane.classList.add('active');
+            // Animate cards in the active category
+            const cards = pane.querySelectorAll('.food-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        } else {
+            pane.classList.remove('active');
+        }
+    });
+}
+
+// Initialize first category on page load
+document.addEventListener('DOMContentLoaded', () => {
+    switchCategory('breakfast');
+    
+    // Initialize intersection observer for initial animations
+    const foodCards = document.querySelectorAll(".food-card");
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
+                }, entry.target.dataset.delay || 0);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    foodCards.forEach((card, index) => {
+        card.dataset.delay = index * 100;
+        observer.observe(card);
+    });
+});
+</script>
+{% endblock %}

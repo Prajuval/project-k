@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div class="container mx-auto px-4 h-screen flex items-center justify-center">
+        <div class="max-w-2xl w-full text-center space-y-8">
+            <!-- Logo or Icon (Optional) -->
+            <div class="mb-8">
+                <i class="fas fa-utensils text-6xl text-indigo-600"></i>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                    CANTEEN PREBOOKING SYSTEM
+                </span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl text-gray-600 mb-12 max-w-lg mx-auto">
+                Order your favorite meals ahead of time and skip the queue
+            </p>
+
+            <!-- Buttons Container -->
+            <div class="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4 justify-center">
+                <a href="{{ url_for('menu') }}" 
+                   class="transform transition-all duration-300 hover:scale-105 
+                          bg-gradient-to-r from-indigo-600 to-purple-600 
+                          text-white font-bold text-xl px-8 py-4 rounded-xl
+                          shadow-lg hover:shadow-2xl inline-flex items-center justify-center">
+                    <i class="fas fa-book-open mr-2"></i>
+                    View Menu
+                </a>
+                
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('register') }}" 
+                       class="transform transition-all duration-300 hover:scale-105 
+                              bg-gradient-to-r from-pink-500 to-rose-500
+                              text-white font-bold text-xl px-8 py-4 rounded-xl
+                              shadow-lg hover:shadow-2xl inline-flex items-center justify-center">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Register Now
+                    </a>
+                    
+                    <a href="{{ url_for('login') }}" 
+                       class="transform transition-all duration-300 hover:scale-105 
+                              bg-gradient-to-r from-emerald-500 to-teal-500 
+                              text-white font-bold text-xl px-8 py-4 rounded-xl
+                              shadow-lg hover:shadow-2xl inline-flex items-center justify-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Login
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Features Section -->
+            <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+                <div class="p-4">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                        <i class="fas fa-clock text-3xl text-indigo-600 mb-4"></i>
+                        <h3 class="text-lg font-semibold mb-2">Save Time</h3>
+                        <p class="text-gray-600">Skip the queue with pre-ordering</p>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                        <i class="fas fa-mobile-alt text-3xl text-pink-600 mb-4"></i>
+                        <h3 class="text-lg font-semibold mb-2">Easy to Use</h3>
+                        <p class="text-gray-600">Simple and intuitive interface</p>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                        <i class="fas fa-star text-3xl text-emerald-600 mb-4"></i>
+                        <h3 class="text-lg font-semibold mb-2">Fresh Food</h3>
+                        <p class="text-gray-600">Quality meals prepared fresh</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

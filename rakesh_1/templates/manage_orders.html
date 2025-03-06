@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Orders - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Orders</h1>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Order Date</th>
+                    <th>Pickup Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr class="order-row">
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ order.pickup_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                    <td>
+                        <span class="badge bg-{{ {
+                            'pending': 'warning',
+                            'paid': 'info',
+                            'completed': 'success',
+                            'cancelled': 'danger'
+                        }[order.status] }}">
+                            {{ order.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ url_for('update_order_status', order_id=order.id, status='completed') }}" class="btn btn-outline-success">Complete</a>
+                            <a href="{{ url_for('update_order_status', order_id=order.id, status='cancelled') }}" class="btn btn-outline-danger">Cancel</a>
+                            <a href="{{ url_for('delete_order', order_id=order.id) }}" class="btn btn-outline-secondary" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation to table rows
+    const rows = document.querySelectorAll('.order-row');
+    rows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in');
+    });
+});
+</script>
+
+<style>
+/* Add fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+</style>
+{% endblock %}

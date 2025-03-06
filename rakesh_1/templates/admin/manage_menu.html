@@ -1,0 +1,465 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Menu - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 animate__animated animate__fadeInDown">
+        <div>
+            <h1 class="text-4xl font-bold text-amber-600 mb-2">Menu Management</h1>
+            <p class="text-gray-500 text-lg">Create, edit and organize your canteen offerings</p>
+        </div>
+        <a href="{{ url_for('add_food') }}"
+           class="mt-4 md:mt-0 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-full shadow-lg transform transition-all hover:-translate-y-1 flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add New Item
+        </a>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="mb-8 animate__animated animate__fadeIn">
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="relative w-full md:w-2/3">
+                <input type="text" id="itemSearch" placeholder="Search menu items..."
+                       class="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all shadow-md">
+                <svg class="w-6 h-6 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <div class="flex gap-3 items-center">
+                <select id="categoryFilter" class="rounded-lg border border-gray-200 py-3 px-4 bg-white shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category }}">{{ category|title }}</option>
+                    {% endfor %}
+                </select>
+                <select id="statusFilter" class="rounded-lg border border-gray-200 py-3 px-4 bg-white shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none">
+                    <option value="">All Status</option>
+                    <option value="available">Available</option>
+                    <option value="unavailable">Unavailable</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Cards -->
+    {% for category, items in categories.items() %}
+    <div class="bg-white rounded-xl shadow-lg mb-8 overflow-hidden animate__animated animate__fadeInUp category-section" data-category="{{ category|lower }}" style="animation-delay: {{ loop.index * 0.1 }}s;">
+        <div class="bg-gradient-to-r from-amber-50 to-coral-50 px-6 py-6 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="rounded-full bg-white p-3 shadow-md mr-4">
+                    <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ category|title }}</h3>
+                    <p class="text-gray-500 text-sm">Manage items in this category</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="px-4 py-2 text-sm font-semibold rounded-full bg-coral-500 text-white shadow-sm flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    {{ items|length }} items
+                </span>
+                <button class="edit-category-btn px-3 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg shadow-sm transition-colors" data-category="{{ category }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in items %}
+                    <tr class="hover:bg-gray-50 transition-colors item-row"
+                        data-item-name="{{ item.name|lower }}"
+                        data-category="{{ category|lower }}"
+                        data-status="{{ 'available' if item.available else 'unavailable' }}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if item.image_url %}
+                            <div class="w-16 h-16 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group">
+                                <img src="{{ item.image_url }}" alt="{{ item.name }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                            </div>
+                            {% else %}
+                            <div class="w-16 h-16 rounded-lg flex items-center justify-center bg-gray-200 text-gray-500">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path>
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <h5 class="text-base font-medium text-gray-900">{{ item.name }}</h5>
+                            <p class="text-sm text-gray-500 mt-1">{{ item.description|truncate(80) }}</p>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-semibold text-amber-600">₹{{ "%.2f"|format(item.price) }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="available_{{ item.id }}"
+                                       class="sr-only peer"
+                                       {% if item.available %}checked{% endif %}
+                                       onchange="toggleAvailability({{ item.id }})">
+                                <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                                <span class="ml-2 text-sm font-medium text-gray-700">{{ 'Available' if item.available else 'Unavailable' }}</span>
+                            </label>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap space-x-2">
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ url_for('edit_food', food_id=item.id) }}"
+                                   class="inline-flex items-center px-3 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-md transition-colors">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                    Edit
+                                </a>
+                                <button onclick="confirmDelete({{ item.id }}, '{{ item.name }}')"
+                                        class="inline-flex items-center px-3 py-2 bg-coral-100 text-coral-700 hover:bg-coral-200 rounded-md transition-colors">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if items|length == 0 %}
+        <div class="py-8 text-center bg-gray-50">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            <h4 class="text-lg font-medium text-gray-500">No items in this category</h4>
+            <a href="{{ url_for('add_food') }}" class="mt-3 inline-block px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">Add Item</a>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if not categories %}
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center animate__animated animate__fadeInUp">
+        <div class="bg-amber-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+            <svg class="w-12 h-12 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No Menu Items Found</h3>
+        <p class="text-gray-500 mb-6">Your menu is currently empty. Start by adding some delicious items!</p>
+        <a href="{{ url_for('add_food') }}" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-full shadow-lg inline-flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add Your First Item
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg max-w-md w-full p-6 shadow-xl transform transition-all">
+        <div class="text-center">
+            <svg class="w-16 h-16 text-coral-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Item</h3>
+            <p class="text-gray-600 mb-6" id="deleteMessage">Are you sure you want to delete this item?</p>
+            <div class="flex justify-center space-x-3">
+                <button id="cancelDelete" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmDelete" class="px-4 py-2 bg-coral-500 hover:bg-coral-600 text-white rounded-lg transition-colors">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom styles for Tailwind -->
+<style>
+    /* Custom colors */
+    .text-coral-500, .hover\:text-coral-500:hover { color: #FF6F61; }
+    .text-coral-600, .hover\:text-coral-600:hover { color: #E86354; }
+    .text-coral-700, .hover\:text-coral-700:hover { color: #D05A4D; }
+
+    .bg-coral-50 { background-color: #FFF0EE; }
+    .bg-coral-100 { background-color: #FFDED9; }
+    .bg-coral-200 { background-color: #FFB5AD; }
+    .bg-coral-500 { background-color: #FF6F61; }
+    .bg-coral-600 { background-color: #E86354; }
+    .hover\:bg-coral-200:hover { background-color: #FFB5AD; }
+    .hover\:bg-coral-600:hover { background-color: #E86354; }
+
+    .border-coral-500 { border-color: #FF6F61; }
+
+    .text-teal-500, .hover\:text-teal-500:hover { color: #20B2AA; }
+    .text-teal-600, .hover\:text-teal-600:hover { color: #199E97; }
+    .text-teal-700, .hover\:text-teal-700:hover { color: #148A84; }
+
+    .bg-teal-50 { background-color: #E6F7F6; }
+    .bg-teal-100 { background-color: #CCEEED; }
+    .bg-teal-200 { background-color: #99DDDA; }
+    .bg-teal-500 { background-color: #20B2AA; }
+
+    .border-teal-500 { border-color: #20B2AA; }
+
+    /* Make table responsive */
+    .overflow-x-auto::-webkit-scrollbar {
+        height: 6px;
+    }
+    .overflow-x-auto::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 3px;
+    }
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        background: #ccc;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search and filtering functionality
+    const searchInput = document.getElementById('itemSearch');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const noResultsDiv = document.createElement('div');
+
+    // Set up the "no results" message element
+    noResultsDiv.className = "hidden bg-white rounded-xl shadow-lg p-8 text-center animate__animated animate__fadeIn mt-6";
+    noResultsDiv.innerHTML = `
+        <div class="bg-amber-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+        <h3 class="text-xl font-medium text-gray-800 mb-1">No matching items found</h3>
+        <p class="text-gray-500 text-sm mb-0">Try adjusting your search or filters</p>
+    `;
+    document.querySelector('.max-w-7xl').appendChild(noResultsDiv);
+
+    function filterItems() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const categoryValue = categoryFilter.value.toLowerCase();
+        const statusValue = statusFilter.value;
+
+        const rows = document.querySelectorAll('.item-row');
+        const categorySections = document.querySelectorAll('.category-section');
+        let visibleItemsCount = 0;
+
+        // Reset all visibility
+        categorySections.forEach(section => section.style.display = 'block');
+
+        // Filter each row based on criteria
+        rows.forEach(row => {
+            const itemName = row.dataset.itemName;
+            const itemCategory = row.dataset.category;
+            const itemStatus = row.dataset.status;
+            const itemElement = row.querySelector('h5');
+            const descElement = row.querySelector('p.text-gray-500');
+
+            // More thorough search through name and description
+            const nameMatch = itemName.includes(searchTerm);
+            const descMatch = descElement && descElement.textContent.toLowerCase().includes(searchTerm);
+            const matchesSearch = searchTerm === '' || nameMatch || descMatch;
+
+            const matchesCategory = categoryValue === '' || itemCategory === categoryValue;
+            const matchesStatus = statusValue === '' || itemStatus === statusValue;
+
+            // Final visibility determination
+            const isVisible = matchesSearch && matchesCategory && matchesStatus;
+            row.style.display = isVisible ? '' : 'none';
+
+            // Count visible items
+            if (isVisible) visibleItemsCount++;
+
+            // Highlight search matches when there's a search term
+            if (searchTerm !== '' && itemElement && isVisible) {
+                highlightText(itemElement, searchTerm);
+                if (descElement) highlightText(descElement, searchTerm);
+            }
+        });
+
+        // Handle empty category sections
+        categorySections.forEach(section => {
+            const visibleRows = Array.from(section.querySelectorAll('.item-row')).filter(
+                row => row.style.display !== 'none'
+            );
+            section.style.display = visibleRows.length > 0 ? 'block' : 'none';
+        });
+
+        // Show/hide "no results" message
+        noResultsDiv.classList.toggle('hidden', visibleItemsCount > 0);
+    }
+
+    // Highlights matching text
+    function highlightText(element, searchTerm) {
+        const originalText = element.textContent;
+        const lowerOriginal = originalText.toLowerCase();
+
+        // Skip if no match
+        if (!lowerOriginal.includes(searchTerm)) return;
+
+        // Store and clear the original text
+        if (!element.dataset.originalText) {
+            element.dataset.originalText = originalText;
+        } else {
+            // Restore original text before highlight
+            element.textContent = element.dataset.originalText;
+        }
+
+        // Skip highlighting for empty search
+        if (searchTerm === '') return;
+
+        // Create highlighted version
+        let highlighted = '';
+        let lastIndex = 0;
+        let index = lowerOriginal.indexOf(searchTerm);
+
+        while (index !== -1) {
+            // Add text before match
+            highlighted += originalText.substring(lastIndex, index);
+
+            // Add highlighted match
+            const match = originalText.substring(index, index + searchTerm.length);
+            highlighted += `<span class="bg-yellow-200">${match}</span>`;
+
+            // Move to next potential match
+            lastIndex = index + searchTerm.length;
+            index = lowerOriginal.indexOf(searchTerm, lastIndex);
+        }
+
+        // Add remaining text
+        highlighted += originalText.substring(lastIndex);
+        element.innerHTML = highlighted;
+    }
+
+    // Add debounce for better performance
+    let debounceTimeout;
+
+    function debounceSearch() {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(filterItems, 300);
+    }
+
+    // Add event listeners
+    searchInput.addEventListener('input', debounceSearch);
+    categoryFilter.addEventListener('change', filterItems);
+    statusFilter.addEventListener('change', filterItems);
+
+    // Clear search button
+    const searchContainer = searchInput.parentElement;
+    const clearButton = document.createElement('button');
+    clearButton.className = "absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden";
+    clearButton.innerHTML = `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    `;
+    searchContainer.appendChild(clearButton);
+
+    searchInput.addEventListener('input', function() {
+        clearButton.classList.toggle('hidden', this.value === '');
+    });
+
+    clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.focus();
+        this.classList.add('hidden');
+        filterItems();
+    });
+
+    // Run initial filtering in case of page reload with values
+    filterItems();
+
+    // Edit category functionality
+    const editCategoryBtns = document.querySelectorAll('.edit-category-btn');
+    editCategoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.dataset.category;
+
+            Swal.fire({
+                title: 'Edit Category',
+                html: `
+                    <input type="text" id="categoryName" class="swal2-input" value="${category}" placeholder="Category name">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                confirmButtonColor: '#20B2AA',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const categoryName = document.getElementById('categoryName').value;
+                    if (!categoryName) {
+                        Swal.showValidationMessage('Please enter a category name');
+                    }
+                    return categoryName;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Here you would make an API call to update the category
+                    fetch(`/admin/update_category/${category}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ new_name: result.value })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                position: 'bottom-end',
+                                icon: 'success',
+                                title: 'Category updated',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                toast: true
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Failed to update the category.',
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
