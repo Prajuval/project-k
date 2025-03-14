@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Campus Bites</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}" defer></script>
+    <script>
+        function filterMenu(category) {
+            // Get all menu sections and buttons
+            const sections = document.querySelectorAll('.menu-section');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Remove active class from all buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-orange-500', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            
+            // Add active class to clicked button
+            const activeButton = document.querySelector(`[data-category="${category}"]`);
+            activeButton.classList.remove('bg-white', 'text-gray-700');
+            activeButton.classList.add('bg-orange-500', 'text-white');
+            
+            // Show/hide sections
+            sections.forEach(section => {
+                if (category === 'all' || section.dataset.category === category) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleCart() {
+            const cart = document.getElementById('cart-sidebar');
+            cart.classList.toggle('translate-x-full');
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-red-100 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-semibold text-orange-600">Campus Bites</a>
+                </div>
+                <div class="flex space-x-4">
+                    {% if 'username' in session %}
+                        <button onclick="toggleCart()" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium relative">
+                            Cart
+                            <span id="cart-count" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </button>
+                        <a href="/orders" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium">My Orders</a>
+                        <a href="/logout" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">Logout</a>
+                    {% else %}
+                        <a href="/login" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                        <a href="/register" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Add cart sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        <!-- ...copy cart sidebar content from user_dashboard.html... -->
+    </div>
+
+    <!-- Menu Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Menu Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Today's Menu</h1>
+                <p class="text-gray-600 mb-8">Pre-order your meals and skip the queue!</p>
+                
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button onclick="filterMenu('all')" 
+                            data-category="all"
+                            class="filter-btn bg-orange-500 text-white px-6 py-2 rounded-full font-medium transition duration-300 hover:shadow-md">
+                        All Items
+                    </button>
+                    <button onclick="filterMenu('breakfast')" 
+                            data-category="breakfast"
+                            class="filter-btn bg-white text-gray-700 px-6 py-2 rounded-full font-medium transition duration-300 hover:shadow-md">
+                        Breakfast
+                    </button>
+                    <button onclick="filterMenu('lunch')" 
+                            data-category="lunch"
+                            class="filter-btn bg-white text-gray-700 px-6 py-2 rounded-full font-medium transition duration-300 hover:shadow-md">
+                        Lunch
+                    </button>
+                    <button onclick="filterMenu('snacks')" 
+                            data-category="snacks"
+                            class="filter-btn bg-white text-gray-700 px-6 py-2 rounded-full font-medium transition duration-300 hover:shadow-md">
+                        Snacks
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menu Categories -->
+            {% for category, items in menu_items.items() %}
+            <div class="menu-section mb-12" data-category="{{ category }}">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 capitalize">{{ category }}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for item in items %}
+                    <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                        <div class="text-4xl mb-4">{{ item.image }}</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ item.name }}</h3>
+                        <p class="text-gray-600 mb-4">{{ item.description }}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-orange-500 font-bold">₹{{ item.price }}</span>
+                            <button onclick="cart.addItem({id: {{ loop.index }}, name: '{{ item.name }}', price: {{ item.price }}})" 
+                                    class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

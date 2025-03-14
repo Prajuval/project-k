@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Campus Bites</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function toggleCart() {
+            const cart = document.getElementById('cart-sidebar');
+            cart.classList.toggle('translate-x-full');
+        }
+    </script>
+    <script>
+        // Cart state
+        let cart = {
+            items: [],
+            total: 0
+        };
+
+        // Cart functions
+        function addToCart(itemId, name, price) {
+            const existingItem = cart.items.find(item => item.id === itemId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.items.push({
+                    id: itemId,
+                    name: name,
+                    price: price,
+                    quantity: 1
+                });
+            }
+            
+            updateCart();
+        }
+
+        function removeFromCart(itemId) {
+            cart.items = cart.items.filter(item => item.id !== itemId);
+            updateCart();
+        }
+
+        function updateQuantity(itemId, change) {
+            const item = cart.items.find(item => item.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function updateCart() {
+            const cartContainer = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+
+            // Calculate total
+            cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Update cart count
+            cartCount.textContent = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+            // Update cart items display
+            cartContainer.innerHTML = cart.items.map(item => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-800">${item.name}</h4>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <button onclick="updateQuantity(${item.id}, -1)" class="text-orange-500 hover:text-orange-600">-</button>
+                            <p class="text-sm text-gray-600">Quantity: ${item.quantity}</p>
+                            <button onclick="updateQuantity(${item.id}, 1)" class="text-orange-500 hover:text-orange-600">+</button>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-medium text-orange-500">₹${item.price * item.quantity}</p>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 text-sm hover:text-red-600">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update totals
+            subtotalElement.textContent = `₹${cart.total.toFixed(2)}`;
+            totalElement.textContent = `₹${cart.total.toFixed(2)}`;
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-red-100 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-semibold text-orange-600">Campus Bites</a>
+                </div>
+                <div class="flex space-x-4 items-center">
+                    <a href="/menu" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium">Today's Menu</a>
+                    <a href="/orders" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium">My Orders</a>
+                    <button onclick="toggleCart()" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium relative">
+                        Cart
+                        <span id="cart-count" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
+                    <a href="/logout" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Your Cart</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Cart Items Container -->
+            <div id="cart-items" class="space-y-4 mb-6">
+                <!-- Items will be dynamically inserted here -->
+            </div>
+
+            <!-- Cart Total -->
+            <div class="border-t pt-4 mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-600">Subtotal</span>
+                    <span id="subtotal" class="font-medium">₹0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Total</span>
+                    <span id="total" class="font-bold text-orange-500">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Checkout Button -->
+            <button onclick="checkout()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">Welcome, {{ username }}! 👋</h1>
+                <p class="text-gray-600">Ready to order your next meal?</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <a href="/menu" class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-4xl mb-4">🍽️</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Today's Menu</h3>
+                    <p class="text-gray-600">Check out what's cooking today</p>
+                </a>
+                <a href="/orders" class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-4xl mb-4">📋</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">My Orders</h3>
+                    <p class="text-gray-600">View your order history and status</p>
+                </a>
+            </div>
+
+            <!-- Additional Features -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                    <div class="text-3xl mb-2">💰</div>
+                    <h3 class="font-semibold text-gray-800">Wallet Balance</h3>
+                    <p class="text-orange-500 font-bold">₹500.00</p>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                    <div class="text-3xl mb-2">🎫</div>
+                    <h3 class="font-semibold text-gray-800">Meal Credits</h3>
+                    <p class="text-orange-500 font-bold">5 remaining</p>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                    <div class="text-3xl mb-2">⭐</div>
+                    <h3 class="font-semibold text-gray-800">Reward Points</h3>
+                    <p class="text-orange-500 font-bold">150 points</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

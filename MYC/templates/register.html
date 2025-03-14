@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Campus Bites</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-red-100 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-semibold text-orange-600">Campus Bites</a>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/menu" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium">Today's Menu</a>
+                    <a href="/login" class="text-gray-600 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Form -->
+    <div class="container mx-auto px-4 h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div class="max-w-md w-full bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Create Account</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-4 mb-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST" class="space-y-6">
+                <div>
+                    <input type="text" name="username" placeholder="Username" required
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition">
+                </div>
+                <div>
+                    <input type="email" name="email" placeholder="Email" required
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition">
+                </div>
+                <div>
+                    <input type="password" name="password" placeholder="Password" required
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition">
+                </div>
+                <!-- Role Selection -->
+                <div class="space-y-2">
+                    <p class="text-lg text-gray-700 font-semibold">Select Your Identity</p>
+                    <p class="text-sm text-gray-600">Let us know who you are, so we can tailor your experience:</p>
+                    <div class="flex space-x-6 mt-2">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" class="form-radio text-orange-500" name="role" value="student" checked>
+                            <span class="font-medium">Student – The Eager Explorer</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" class="form-radio text-orange-500" name="role" value="teacher">
+                            <span class="font-medium">Teacher – The Enlightening Mentor</span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" 
+                        class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300">
+                    Register
+                </button>
+            </form>
+            <p class="text-center mt-6 text-gray-600">
+                Already have an account? 
+                <a href="/login" class="text-orange-500 hover:text-orange-600 font-semibold">Login here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
